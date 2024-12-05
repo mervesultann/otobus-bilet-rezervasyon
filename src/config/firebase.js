@@ -1,16 +1,15 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
-
 const firebaseConfig = {
-    apiKey: "AIzaSyBDJFQgkqju2cHTE75tmb30CkMAhX1Vz9k",
-    authDomain: "otobus-rezervasyon.firebaseapp.com",
-    projectId: "otobus-rezervasyon",
-    storageBucket: "otobus-rezervasyon.firebasestorage.app",
-    messagingSenderId: "356188237296",
-    appId: "1:356188237296:web:e21a789dd14b2c1fa2c135",
-    measurementId: "G-GYSCHG9D3Y"
-  };
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+};
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
