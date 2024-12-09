@@ -6,6 +6,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./config/firebase";
 import { setUser } from "./redux/slices/authSlice";
 import { useEffect } from "react";
+import { fetchUserRole } from "./redux/slices/roleSlice";
 
 
 
@@ -16,7 +17,8 @@ function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if(currentUser){
-        dispatch(setUser(currentUser));
+        dispatch(setUser(currentUser.providerData[0]));
+        dispatch(fetchUserRole(currentUser.uid));
       }else{
         dispatch(setUser(null));
       }

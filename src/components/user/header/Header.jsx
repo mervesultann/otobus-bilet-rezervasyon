@@ -29,7 +29,8 @@ const Header = () => {
  
   const dispatch = useDispatch();
   const { user} = useSelector((state) => state.auth); 
-  
+  const { currentUserRole } = useSelector((state) => state.role);
+ 
 
   return (
     <Disclosure as="nav" className="bg-slate-800 sticky top-0 z-50">
@@ -116,6 +117,30 @@ const Header = () => {
                     transition
                     className="absolute right-0 z-10 mt-3 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5"
                   >
+
+                    {currentUserRole === "admin" && (
+                      <MenuItem>
+                        <Link to="/admin" className="block px-4 py-2 text-sm text-gray-700">
+                          Admin Paneli
+                        </Link>
+                      </MenuItem>
+                    )}
+
+                    {currentUserRole === "user" && (
+                      <>
+                      <MenuItem>
+                        <Link to="/user/profile" className="block px-4 py-2 text-sm text-gray-700">
+                          Profil
+                        </Link>
+                      </MenuItem>
+                       <MenuItem>
+                       <Link to="/user/bilets" className="block px-4 py-2 text-sm text-gray-700">
+                        Biletlerim
+                       </Link>
+                     </MenuItem>
+                      </>
+                    )}
+
                     <MenuItem>
                       <button
                         className="block px-4 py-2 text-sm text-gray-700"
