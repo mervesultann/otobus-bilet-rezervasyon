@@ -10,6 +10,7 @@ import NotFound from "../pages/NotFound"
 import HomePage from "../pages/user/Home"
 import LoginPage from "../pages/auth/LoginPage"
 import RegisterPage from "../pages/auth/RegisterPage"
+import SeferSonuclari from "../pages/user/SeferSonuclari"
 
 
 const userRoutes = [
@@ -28,6 +29,7 @@ const userRoutes = [
           { path: "*", element: <NotFound /> },
           { path: "login", element: <LoginPage /> },
           { path: "register", element: <RegisterPage /> },
+          { path: "sefer-sonuclari", element: <SeferSonuclari /> },
         ],
       },
 ]

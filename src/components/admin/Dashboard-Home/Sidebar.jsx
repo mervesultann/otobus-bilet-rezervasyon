@@ -8,6 +8,7 @@ import {
   FaTicketAlt,
   FaBars,
   FaTimes,
+  FaGlobeAmericas,
 } from "react-icons/fa";
 
 const Sidebar = ({ isMobile }) => {
@@ -91,6 +92,16 @@ const Sidebar = ({ isMobile }) => {
           >
             <FaTicketAlt className={`text-xl ${isMobile ? "" : "block"}`} />
             {(isOpen || isMobile) && <span className="ml-3">Biletler</span>}
+          </Link>
+        </li>
+
+        <li>
+          <Link
+            to="/"
+            className="flex items-center hover:bg-gray-700 p-2 rounded"
+          >
+            <FaGlobeAmericas className={`text-xl ${isMobile ? "" : "block"}`} />
+            {(isOpen || isMobile) && <span className="ml-3">Website</span>}
           </Link>
         </li>
       </ul>

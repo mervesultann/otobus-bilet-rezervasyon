@@ -6,12 +6,13 @@ import FaQuestion from "../../components/user/sorular/FaQuestion";
 const SearchTicket = () => {
   return (
     <div className="container mx-auto px-4 py-12">
-     
-<div className="bg-orange-100 rounded-xl shadow-lg w-full h-[500px] mx-auto flex justify-center items-center">
-      <div className="container mx-auto w-full h-full flex justify-center items-center">
+      <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-lg p-8">
+        <h1 className="text-3xl font-bold text-white text-center mb-8">
+          Otobüs Bileti Ara
+        </h1>
         <SeferSearch />
       </div>
-      </div>
+      
       <Spacer />
       <Fırsatlar />
       <Spacer />
