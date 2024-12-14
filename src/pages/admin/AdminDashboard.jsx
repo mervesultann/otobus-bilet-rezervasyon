@@ -1,87 +1,189 @@
-import { FaUsers, FaBus, FaMoneyBillWave, FaTicketAlt } from "react-icons/fa";
-import StatCard from "../../components/admin/StatCard";
-import SalesChart from "../../components/admin/SalesChart";
-import UserActivityChart from "../../components/admin/UserActivityChart";
-import RecentTransactionsTable from "../../components/admin/RecentTransactionsTable";
-
-const salesData = [
-  { name: 'Ocak', satis: 4000 },
-  { name: 'Şubat', satis: 3000 },
-  { name: 'Mart', satis: 5000 },
-  { name: 'Nisan', satis: 4500 },
-  { name: 'Mayıs', satis: 6000 },
-  { name: 'Haziran', satis: 5500 },
-];
-
-const userStats = [
-  { name: 'Pzt', aktif: 2400 },
-  { name: 'Sal', aktif: 1398 },
-  { name: 'Çar', aktif: 3800 },
-  { name: 'Per', aktif: 3908 },
-  { name: 'Cum', aktif: 4800 },
-  { name: 'Cmt', aktif: 3800 },
-  { name: 'Paz', aktif: 4300 },
-];
+import { useState, useEffect } from "react";
+import { Card, Row, Col, Statistic, Table, List, Avatar, Tabs, Tag } from "antd";
+import {
+  UserOutlined,
+  CarOutlined,
+  DollarOutlined,
+  ScheduleOutlined,
+  RiseOutlined,
+  TeamOutlined,
+} from "@ant-design/icons";
+import { getSeferler } from "../../services/seferlerService";
+import { getAllBiletler } from "../../services/biletService";
+import dayjs from "dayjs";
+import SatisGrafigi from "../../components/admin/dashboard/SatisGrafigi";
+import PopulerRotalar from "../../components/admin/dashboard/PopulerRotalar";
 
 const AdminDashboardPage = () => {
+  const [istatistikler, setIstatistikler] = useState({
+    toplamBilet: 0,
+    bugunSatilanBilet: 0,
+    toplamSefer: 0,
+    toplamGelir: 0,
+    toplamUye: 0,
+    sonBiletler: [],
+    populerRotalar: [],
+    uyeler: [],
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [biletler, seferler] = await Promise.all([
+          getAllBiletler(),
+          getSeferler(),
+        ]);
+
+        const bugun = dayjs().startOf('day');
+        const bugunSatilanBiletler = biletler.filter(bilet => 
+          dayjs(bilet.createdAt?.toDate()).isAfter(bugun)
+        );
+
+        // Popüler rotaları hesapla
+        const rotalar = biletler.reduce((acc, bilet) => {
+          const rota = `${bilet.seferBilgileri.kalkis} - ${bilet.seferBilgileri.varis}`;
+          acc[rota] = (acc[rota] || 0) + 1;
+          return acc;
+        }, {});
+
+        const populerRotalar = Object.entries(rotalar)
+          .map(([rota, sayi]) => ({ rota, sayi }))
+          .sort((a, b) => b.sayi - a.sayi)
+          .slice(0, 5);
+
+        const toplamGelir = biletler.reduce((toplam, bilet) => 
+          toplam + (bilet.seferBilgileri?.fiyat || 0), 0
+        );
+
+        setIstatistikler({
+          toplamBilet: biletler.length,
+          bugunSatilanBilet: bugunSatilanBiletler.length,
+          toplamSefer: seferler.length,
+          toplamGelir: toplamGelir,
+          toplamUye: 0,
+          sonBiletler: biletler.slice(-5).reverse(),
+          populerRotalar,
+          uyeler: [],
+        });
+
+      } catch (error) {
+        console.error("Veri yükleme hatası:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
-    <>
-      <div className="p-2 sm:p-4 md:p-6 max-w-[2000px] mx-auto">
-        <div className="flex flex-col gap-6">
-          {/* Header */}
-          <div className="bg-white p-4 rounded-lg shadow-lg">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Dashboard</h1>
-          </div>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
+      
+      {/* İstatistik Kartları */}
+      <Row gutter={[16, 16]} className="mb-6">
+        <Col xs={24} sm={12} lg={6}>
+          <Card>
+            <Statistic
+              title="Toplam Bilet Sayısı"
+              value={istatistikler.toplamBilet}
+              prefix={<UserOutlined />}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card>
+            <Statistic
+              title="Bugün Satılan Bilet"
+              value={istatistikler.bugunSatilanBilet}
+              prefix={<ScheduleOutlined />}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card>
+            <Statistic
+              title="Toplam Sefer Sayısı"
+              value={istatistikler.toplamSefer}
+              prefix={<CarOutlined />}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card>
+            <Statistic
+              title="Toplam Gelir"
+              value={istatistikler.toplamGelir}
+              prefix={<DollarOutlined />}
+              suffix="₺"
+              precision={2}
+            />
+          </Card>
+        </Col>
+      </Row>
 
-          {/* Stat Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            <StatCard 
-              title="Toplam Kullanıcı" 
-              value="15,350" 
-              percentage="+12%" 
-              icon={<FaUsers className="text-orange-500 text-xl" />} 
-              color="bg-orange-100" 
-            />
-            <StatCard 
-              title="Aktif Seferler" 
-              value="245" 
-              percentage="+5%" 
-              icon={<FaBus className="text-blue-500 text-xl" />} 
-              color="bg-blue-100" 
-            />
-            <StatCard 
-              title="Aylık Gelir" 
-              value="₺125,400" 
-              percentage="+18%" 
-              icon={<FaMoneyBillWave className="text-green-500 text-xl" />} 
-              color="bg-green-100" 
-            />
-            <StatCard 
-              title="Satılan Bilet" 
-              value="1,240" 
-              percentage="+8%" 
-              icon={<FaTicketAlt className="text-purple-500 text-xl" />} 
-              color="bg-purple-100" 
-            />
-          </div>
+      {/* Grafikler Bölümü */}
+      <Row gutter={[16, 16]} className="mb-6">
+        <Col xs={24} lg={16}>
+          <Card title="Satış Grafiği" className="h-[400px]">
+            <SatisGrafigi biletler={istatistikler.sonBiletler} />
+          </Card>
+        </Col>
+        <Col xs={24} lg={8}>
+          <Card title="Popüler Rotalar" className="h-[400px]">
+            <PopulerRotalar rotalar={istatistikler.populerRotalar} />
+          </Card>
+        </Col>
+      </Row>
 
-          {/* Charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-            <div className="w-full min-h-[400px]">
-              <SalesChart data={salesData} />
-            </div>
-            <div className="w-full min-h-[400px]">
-              <UserActivityChart data={userStats} />
-            </div>
-          </div>
-
-          {/* Recent Transactions */}
-          <div className="overflow-hidden">
-            <RecentTransactionsTable transactions={[1, 2, 3, 4, 5]} />
-          </div>
-        </div>
-      </div>
-    </>
+      {/* Son ��şlemler ve Detaylar */}
+      <Row gutter={[16, 16]}>
+        <Col xs={24} lg={12}>
+          <Card title="Son Satılan Biletler">
+            <List
+              itemLayout="horizontal"
+              dataSource={istatistikler.sonBiletler}
+              renderItem={bilet => (
+                <List.Item>
+                  <List.Item.Meta
+                    avatar={<Avatar icon={<UserOutlined />} />}
+                    title={`${bilet.yolcuBilgileri.ad} ${bilet.yolcuBilgileri.soyad}`}
+                    description={
+                      <>
+                        <div>{bilet.seferBilgileri.kalkis} - {bilet.seferBilgileri.varis}</div>
+                        <div className="text-sm text-gray-500">
+                          {dayjs(bilet.createdAt?.toDate()).format("DD.MM.YYYY HH:mm")}
+                        </div>
+                      </>
+                    }
+                  />
+                  <div className="font-semibold">₺{bilet.seferBilgileri.fiyat}</div>
+                </List.Item>
+              )}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} lg={12}>
+          <Card title="Haftalık Özet">
+            <Table
+              dataSource={istatistikler.populerRotalar}
+              columns={[
+                {
+                  title: 'Rota',
+                  dataIndex: 'rota',
+                  key: 'rota',
+                },
+                {
+                  title: 'Satış',
+                  dataIndex: 'sayi',
+                  key: 'sayi',
+                  render: (sayi) => <Tag color="blue">{sayi}</Tag>
+                }
+              ]}
+              pagination={false}
+            />
+          </Card>
+        </Col>
+      </Row>
+    </div>
   );
 };
 

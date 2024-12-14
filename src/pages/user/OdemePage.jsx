@@ -4,8 +4,9 @@ import { Form, Input, Button, Card, Radio } from "antd";
 import { CreditCardOutlined, WalletOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { addBilet } from "../../services/biletService";
+import { addBilet, checkKoltukDurumu, iptalBilet } from "../../services/biletService";
 import { updateSeferKoltuk } from "../../services/seferlerService";
+import { serverTimestamp } from "firebase/firestore";
 
 const OdemePage = () => {
   const location = useLocation();
@@ -15,44 +16,112 @@ const OdemePage = () => {
   const user = useSelector((state) => state.auth.user);
 
   const handleSubmit = async (values) => {
+    if (!user?.uid) {
+      toast.error("Lütfen giriş yapınız");
+      return;
+    }
+
+    if (!seferBilgileri?.id || !yolcuBilgileri || !koltukNo) {
+      toast.error("Eksik bilgi. Lütfen bilet seçim sayfasına geri dönün.");
+      return;
+    }
+
     setLoading(true);
+    let kaydedilenBilet = null;
+    let geciciRezervasyon = false;
+
     try {
-      // Önce bilet kaydını oluştur
+      // Koltuk kontrolü
+      const koltukDurumu = await checkKoltukDurumu(seferBilgileri.id, koltukNo);
+      if (koltukDurumu?.dolu) {
+        toast.error("Seçtiğiniz koltuk başkası tarafından alınmış");
+        navigate(-1);
+        return;
+      }
+
+      // Geçici rezervasyon
+      await updateSeferKoltuk(seferBilgileri.id, koltukNo, {
+        dolu: true,
+        geciciRezervasyon: true,
+        rezervasyonTarihi: new Date().toISOString(),
+        userId: user.uid
+      });
+      geciciRezervasyon = true;
+
+      // Bilet verilerini hazırla
       const biletData = {
         userId: user.uid,
         seferId: seferBilgileri.id,
-        yolcuBilgileri,
+        yolcuBilgileri: {
+          ad: yolcuBilgileri.ad,
+          soyad: yolcuBilgileri.soyad,
+          tcno: yolcuBilgileri.tcno,
+          cinsiyet: yolcuBilgileri.cinsiyet,
+          email: user.email
+        },
         koltukNo,
-        seferBilgileri,
-        odemeBilgileri: values,
+        seferBilgileri: {
+          kalkis: seferBilgileri.kalkis || '',
+          varis: seferBilgileri.varis || '',
+          tarih: seferBilgileri.tarih || '',
+          saat: seferBilgileri.kalkisSaati || '',
+          fiyat: seferBilgileri.fiyat || 0,
+          kalkisSaati: seferBilgileri.kalkisSaati || '',
+          varisSaati: seferBilgileri.varisSaati || ''
+        },
+        createdAt: serverTimestamp(),
+        odemeBilgileri: {
+          cardNumber: values.cardNumber?.replace(/\s/g, '').slice(-4) || '',
+          cardHolderName: values.cardHolderName || '',
+          odemeTarihi: serverTimestamp(),
+          odemeYontemi: "kart"
+        },
         aktif: true,
-        createdAt: new Date().toISOString(),
+        durum: "ONAYLANDI"
       };
 
-      const biletRef = await addBilet(biletData);
+      // Bileti kaydet
+      kaydedilenBilet = await addBilet(biletData);
 
-      // Sonra koltuğu güncelle
+      // Koltuğu güncelle
       await updateSeferKoltuk(seferBilgileri.id, koltukNo, {
-        cinsiyet: yolcuBilgileri.cinsiyet,
         dolu: true,
-        biletId: biletRef.id,
+        geciciRezervasyon: false,
+        cinsiyet: yolcuBilgileri.cinsiyet,
+        biletId: kaydedilenBilet.id,
+        userId: user.uid
       });
 
+      toast.success("Ödeme başarıyla tamamlandı");
+      
       navigate("/bilet-basarili", {
         state: {
           biletDetay: {
             ...yolcuBilgileri,
-            koltukNo,
             ...seferBilgileri,
-            odemeBilgileri: values,
-          },
-        },
+            koltukNo,
+            biletNo: kaydedilenBilet.biletNo
+          }
+        }
       });
 
-      toast.success("Ödeme başarıyla tamamlandı");
     } catch (error) {
-      console.error("Hata:", error);
-      toast.error("Ödeme işlemi sırasında bir hata oluştu");
+      console.error("Ödeme hatası:", error);
+      
+      if (geciciRezervasyon) {
+        try {
+          await updateSeferKoltuk(seferBilgileri.id, koltukNo, {
+            dolu: false,
+            geciciRezervasyon: false,
+            userId: null,
+            biletId: null
+          });
+        } catch (rezervasyonError) {
+          console.error("Rezervasyon iptal hatası:", rezervasyonError);
+        }
+      }
+
+      toast.error(error.message || "Ödeme işlemi sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
     } finally {
       setLoading(false);
     }
@@ -120,7 +189,7 @@ const OdemePage = () => {
           <Card title="Kart Bilgileri">
             <Form.Item
               name="cardNumber"
-              label="Kart Numaras��"
+              label="Kart Numarası"
               rules={[{ required: true, message: "Kart numarası gereklidir" }]}
             >
               <Input maxLength={16} placeholder="1234 5678 9012 3456" />

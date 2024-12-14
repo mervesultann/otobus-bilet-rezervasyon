@@ -51,7 +51,11 @@ const SeferBiletleri = ({ seferId, visible, onClose }) => {
       title: "Satın Alma Tarihi",
       dataIndex: "createdAt",
       key: "createdAt",
-      render: (tarih) => dayjs(tarih).format("DD.MM.YYYY HH:mm"),
+      render: (tarih) => {
+        if (!tarih) return "-";
+        const date = tarih?.toDate ? tarih.toDate() : new Date(tarih);
+        return dayjs(date).format("DD.MM.YYYY HH:mm");
+      },
     },
   ];
 

@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Table, Button, Empty } from 'antd';
-import { useLocation, useNavigate } from 'react-router-dom';
-import dayjs from 'dayjs';
+import { useState, useEffect } from "react";
+import { Table, Button, Empty } from "antd";
+import { useLocation, useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
 
 const SeferSonuclari = () => {
   const location = useLocation();
@@ -11,7 +11,7 @@ const SeferSonuclari = () => {
 
   useEffect(() => {
     if (!searchParams) {
-      navigate('/search-ticket');
+      navigate("/search-ticket");
       return;
     }
     setSeferler(location.state?.seferler || []);
@@ -19,35 +19,45 @@ const SeferSonuclari = () => {
 
   const columns = [
     {
-      title: 'Kalkış',
-      dataIndex: 'kalkis',
-      key: 'kalkis',
+      title: "Kalkış",
+      dataIndex: "kalkis",
+      key: "kalkis",
     },
     {
-      title: 'Varış',
-      dataIndex: 'varis',
-      key: 'varis',
+      title: "Varış",
+      dataIndex: "varis",
+      key: "varis",
     },
     {
-      title: 'Tarih',
-      dataIndex: 'tarih',
-      key: 'tarih',
-      render: (tarih) => dayjs(tarih).format('DD.MM.YYYY'),
+      title: "Tarih",
+      dataIndex: "tarih",
+      key: "tarih",
+      render: (tarih) => dayjs(tarih).format("DD.MM.YYYY"),
     },
     {
-      title: 'Saat',
-      dataIndex: 'saat',
-      key: 'saat',
+      title: "Saat",
+      dataIndex: "saat",
+      key: "saat",
     },
     {
-      title: 'Fiyat',
-      dataIndex: 'fiyat',
-      key: 'fiyat',
+      title: "Fiyat",
+      dataIndex: "fiyat",
+      key: "fiyat",
       render: (fiyat) => `₺${fiyat.toFixed(2)}`,
     },
     {
-      title: 'İşlem',
-      key: 'action',
+      title: "Kalkış Saati",
+      dataIndex: "kalkisSaati",
+      key: "kalkisSaati",
+    },
+    {
+      title: "Varış Saati",
+      dataIndex: "varisSaati",
+      key: "varisSaati",
+    },
+    {
+      title: "İşlem",
+      key: "action",
       render: (_, record) => (
         <Button
           type="primary"
@@ -68,7 +78,7 @@ const SeferSonuclari = () => {
             <p>
               {searchParams?.kalkis} - {searchParams?.varis}
             </p>
-            <p>Tarih: {dayjs(searchParams?.tarih).format('DD.MM.YYYY')}</p>
+            <p>Tarih: {dayjs(searchParams?.tarih).format("DD.MM.YYYY")}</p>
           </div>
         </div>
 
@@ -84,7 +94,7 @@ const SeferSonuclari = () => {
             description="Bu kriterlere uygun sefer bulunamadı"
             className="my-8"
           >
-            <Button type="primary" onClick={() => navigate('/search-ticket')}>
+            <Button type="primary" onClick={() => navigate("/search-ticket")}>
               Yeni Arama Yap
             </Button>
           </Empty>
@@ -94,4 +104,4 @@ const SeferSonuclari = () => {
   );
 };
 
-export default SeferSonuclari; 
+export default SeferSonuclari;

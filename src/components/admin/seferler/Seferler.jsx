@@ -1,10 +1,30 @@
-import { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, DatePicker, TimePicker, Popconfirm, message } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons';
-import { getSeferler, addSefer, updateSefer, deleteSefer } from '../../../services/seferlerService';
-import dayjs from 'dayjs';
-import locale from 'antd/es/date-picker/locale/tr_TR';
-import SeferBiletleri from './SeferBiletleri';
+import { useState, useEffect } from "react";
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  DatePicker,
+  TimePicker,
+  Popconfirm,
+  message,
+} from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
+import {
+  getSeferler,
+  addSefer,
+  updateSefer,
+  deleteSefer,
+} from "../../../services/seferlerService";
+import dayjs from "dayjs";
+import locale from "antd/es/date-picker/locale/tr_TR";
+import SeferBiletleri from "./SeferBiletleri";
 
 const Seferler = () => {
   const [seferler, setSeferler] = useState([]);
@@ -21,7 +41,7 @@ const Seferler = () => {
       const data = await getSeferler();
       setSeferler(data);
     } catch (error) {
-      console.error('Seferler yüklenirken hata:', error);
+      console.error("Seferler yüklenirken hata:", error);
     } finally {
       setLoading(false);
     }
@@ -36,14 +56,15 @@ const Seferler = () => {
       const seferData = {
         kalkis: values.kalkis,
         varis: values.varis,
-        tarih: values.tarih.format('YYYY-MM-DD'),
-        saat: values.saat.format('HH:mm'),
+        tarih: values.tarih.format("YYYY-MM-DD"),
+        kalkisSaati: values.kalkisSaati.format("HH:mm"),
+        varisSaati: values.varisSaati.format("HH:mm"),
         fiyat: parseFloat(values.fiyat),
         koltukSayisi: parseInt(values.koltukSayisi, 10),
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       };
 
-      console.log('Kaydedilecek sefer:', seferData);
+      console.log("Kaydedilecek sefer:", seferData);
 
       if (editingSefer) {
         await updateSefer(editingSefer.id, seferData);
@@ -55,7 +76,7 @@ const Seferler = () => {
       form.resetFields();
       fetchSeferler();
     } catch (error) {
-      console.error('Sefer eklenirken/güncellenirken hata:', error);
+      console.error("Sefer eklenirken/güncellenirken hata:", error);
     }
   };
 
@@ -64,45 +85,50 @@ const Seferler = () => {
       await deleteSefer(id);
       fetchSeferler();
     } catch (error) {
-      console.error('Sefer silinirken hata:', error);
+      console.error("Sefer silinirken hata:", error);
     }
   };
 
   const columns = [
     {
-      title: 'Kalkış',
-      dataIndex: 'kalkis',
-      key: 'kalkis',
+      title: "Kalkış",
+      dataIndex: "kalkis",
+      key: "kalkis",
     },
     {
-      title: 'Varış',
-      dataIndex: 'varis',
-      key: 'varis',
+      title: "Varış",
+      dataIndex: "varis",
+      key: "varis",
     },
     {
-      title: 'Tarih',
-      dataIndex: 'tarih',
-      key: 'tarih',
+      title: "Tarih",
+      dataIndex: "tarih",
+      key: "tarih",
     },
     {
-      title: 'Saat',
-      dataIndex: 'saat',
-      key: 'saat',
+      title: "Kalkış Saati",
+      dataIndex: "kalkisSaati",
+      key: "kalkisSaati",
     },
     {
-      title: 'Fiyat',
-      dataIndex: 'fiyat',
-      key: 'fiyat',
+      title: "Varış Saati",
+      dataIndex: "varisSaati",
+      key: "varisSaati",
+    },
+    {
+      title: "Fiyat",
+      dataIndex: "fiyat",
+      key: "fiyat",
       render: (fiyat) => `₺${fiyat.toFixed(2)}`,
     },
     {
-      title: 'Koltuk Sayısı',
-      dataIndex: 'koltukSayisi',
-      key: 'koltukSayisi',
+      title: "Koltuk Sayısı",
+      dataIndex: "koltukSayisi",
+      key: "koltukSayisi",
     },
     {
-      title: 'İşlemler',
-      key: 'actions',
+      title: "İşlemler",
+      key: "actions",
       render: (_, record) => (
         <div className="space-x-2">
           <Button
@@ -113,7 +139,8 @@ const Seferler = () => {
               form.setFieldsValue({
                 ...record,
                 tarih: dayjs(record.tarih),
-                saat: dayjs(record.saat, 'HH:mm'),
+                kalkisSaati: dayjs(record.kalkisSaati, "HH:mm"),
+                varisSaati: dayjs(record.varisSaati, "HH:mm"),
               });
               setModalVisible(true);
             }}
@@ -169,7 +196,7 @@ const Seferler = () => {
       />
 
       <Modal
-        title={editingSefer ? 'Sefer Düzenle' : 'Yeni Sefer Ekle'}
+        title={editingSefer ? "Sefer Düzenle" : "Yeni Sefer Ekle"}
         open={modalVisible}
         onCancel={() => {
           setModalVisible(false);
@@ -188,7 +215,7 @@ const Seferler = () => {
           <Form.Item
             name="kalkis"
             label="Kalkış"
-            rules={[{ required: true, message: 'Kalkış noktası zorunludur!' }]}
+            rules={[{ required: true, message: "Kalkış noktası zorunludur!" }]}
           >
             <Input placeholder="Örn: İstanbul" />
           </Form.Item>
@@ -196,7 +223,7 @@ const Seferler = () => {
           <Form.Item
             name="varis"
             label="Varış"
-            rules={[{ required: true, message: 'Varış noktası zorunludur!' }]}
+            rules={[{ required: true, message: "Varış noktası zorunludur!" }]}
           >
             <Input placeholder="Örn: Ankara" />
           </Form.Item>
@@ -204,7 +231,7 @@ const Seferler = () => {
           <Form.Item
             name="tarih"
             label="Tarih"
-            rules={[{ required: true, message: 'Tarih zorunludur!' }]}
+            rules={[{ required: true, message: "Tarih zorunludur!" }]}
           >
             <DatePicker
               className="w-full"
@@ -214,21 +241,25 @@ const Seferler = () => {
           </Form.Item>
 
           <Form.Item
-            name="saat"
-            label="Saat"
-            rules={[{ required: true, message: 'Saat zorunludur!' }]}
+            name="kalkisSaati"
+            label="Kalkış Saati"
+            rules={[{ required: true, message: "Kalkış saati zorunludur!" }]}
           >
-            <TimePicker
-              className="w-full"
-              format="HH:mm"
-              locale={locale}
-            />
+            <TimePicker className="w-full" format="HH:mm" locale={locale} />
+          </Form.Item>
+
+          <Form.Item
+            name="varisSaati"
+            label="Varış Saati"
+            rules={[{ required: true, message: "Varış saati zorunludur!" }]}
+          >
+            <TimePicker className="w-full" format="HH:mm" locale={locale} />
           </Form.Item>
 
           <Form.Item
             name="fiyat"
             label="Fiyat"
-            rules={[{ required: true, message: 'Fiyat zorunludur!' }]}
+            rules={[{ required: true, message: "Fiyat zorunludur!" }]}
           >
             <Input
               type="number"
@@ -241,18 +272,16 @@ const Seferler = () => {
           <Form.Item
             name="koltukSayisi"
             label="Koltuk Sayısı"
-            rules={[{ required: true, message: 'Koltuk sayısı zorunludur!' }]}
+            rules={[{ required: true, message: "Koltuk sayısı zorunludur!" }]}
           >
             <Input type="number" min={1} max={50} />
           </Form.Item>
 
           <Form.Item className="mb-0">
             <div className="flex justify-end space-x-2">
-              <Button onClick={() => setModalVisible(false)}>
-                İptal
-              </Button>
+              <Button onClick={() => setModalVisible(false)}>İptal</Button>
               <Button type="primary" htmlType="submit">
-                {editingSefer ? 'Güncelle' : 'Ekle'}
+                {editingSefer ? "Güncelle" : "Ekle"}
               </Button>
             </div>
           </Form.Item>
