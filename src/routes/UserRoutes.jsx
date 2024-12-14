@@ -11,6 +11,11 @@ import HomePage from "../pages/user/Home"
 import LoginPage from "../pages/auth/LoginPage"
 import RegisterPage from "../pages/auth/RegisterPage"
 import SeferSonuclari from "../pages/user/SeferSonuclari"
+import UserProfile from "../pages/user/UserProfile"
+import BiletAlPage from "../pages/user/BiletAlPage"
+import OdemePage from "../pages/user/OdemePage"
+import BiletBasariliPage from "../pages/user/BiletBasariliPage"
+import Biletlerim from "../pages/user/Biletlerim"
 
 
 const userRoutes = [
@@ -26,10 +31,17 @@ const userRoutes = [
           { path: "privacy", element: <PrivacyPage /> },
           { path: "terms", element: <TermsPage /> },
           { path: "cookies", element: <CookiesPage /> },
-          { path: "*", element: <NotFound /> },
+          
           { path: "login", element: <LoginPage /> },
           { path: "register", element: <RegisterPage /> },
           { path: "sefer-sonuclari", element: <SeferSonuclari /> },
+          { path: "profile", element: <UserProfile /> },
+          { path: "bilet-al/:seferId", element: <BiletAlPage /> },
+          { path: "odeme/:seferId", element: <OdemePage /> },
+          { path: "bilet-basarili", element: <BiletBasariliPage /> },
+          { path: "biletlerim", element: <Biletlerim /> },
+
+          { path: "*", element: <NotFound /> },
         ],
       },
 ]

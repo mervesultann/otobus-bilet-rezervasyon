@@ -1,7 +1,13 @@
+import Users from "../../components/admin/users/Users"
 
 const UsersPage = () => {
   return (
-    <div>UsersPage</div>
+    <div>
+
+      <Users/>
+
+
+    </div>
   )
 }
 

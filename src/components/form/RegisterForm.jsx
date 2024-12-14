@@ -51,13 +51,18 @@ const RegisterForm = () => {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = async ({email,password,name}) => {
+  const handleRegister = async (values) => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      await dispatch(registerUser({email, password, name}));
+      await dispatch(registerUser({
+        email: values.email,
+        password: values.password,
+        name: values.name,
+        tel: values.tel
+      })).unwrap();
       navigate("/");
     } catch (error) {
-      console.log(error);
+      console.error("Kayıt hatası:", error);
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +90,7 @@ const RegisterForm = () => {
             </Link>
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit(handleRegister)}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
               <input

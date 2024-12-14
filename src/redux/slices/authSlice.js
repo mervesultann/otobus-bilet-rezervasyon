@@ -9,28 +9,47 @@ const provider = new GoogleAuthProvider();
 // Async thunk for user registration
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
-  async ({ email, password, name }, { rejectWithValue }) => {
+  async ({ email, password, name, tel }, { rejectWithValue }) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      
-      await updateProfile(userCredential.user, {
-        displayName: name
-      });
+      const user = userCredential.user;
 
-      await setDoc(doc(db, 'users', userCredential.user.uid), {
+      // Önce Firestore'a kullanıcı bilgilerini kaydet
+      await setDoc(doc(db, 'users', user.uid), {
+        uid: user.uid,
         role: 'user',
         email,
         fullName: name,
-        createdAt: new Date().toISOString()
+        tel,
+        createdAt: new Date().toISOString(),
+        photoURL: null,
+        status: 'active'
       });
 
-      toast.success(`Hesabınız başarıyla oluşturuldu, ${name}!`);
-      return {
-        uid: userCredential.user.uid,
-        email: userCredential.user.email,
-        displayName: name
+      // Sonra displayName güncelle
+      try {
+        await updateProfile(user, {
+          displayName: name
+        });
+      } catch (profileError) {
+        console.error("Profile güncelleme hatası:", profileError);
+      }
+
+      const userData = {
+        uid: user.uid,
+        email: user.email,
+        displayName: name,
+        role: 'user'
       };
+
+      toast.success(`Hesabınız başarıyla oluşturuldu, ${name}!`);
+      return userData;
     } catch (error) {
+      if (error.code === 'auth/email-already-in-use') {
+        toast.error('Bu email adresi zaten kullanımda!');
+      } else {
+        toast.error(error.message);
+      }
       return rejectWithValue(error.message);
     }
   }
@@ -54,6 +73,7 @@ export const logoutUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       await signOut(auth);
+      
       return null;
     } catch (error) {
       return rejectWithValue(error.message);

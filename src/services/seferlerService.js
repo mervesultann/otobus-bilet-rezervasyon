@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDocs, orderBy, query, updateDoc, where, and } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDocs, orderBy, query, updateDoc, where, and, getDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
 import toast from "react-hot-toast";
 
@@ -103,6 +103,46 @@ export const getSehirler = async () => {
     return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
     toast.error("Şehirler yüklenirken bir hata oluştu");
+    throw error;
+  }
+};
+
+export const getSeferById = async (seferId) => {
+  try {
+    const seferDoc = await getDoc(doc(db, "seferler", seferId));
+    if (seferDoc.exists()) {
+      return { id: seferDoc.id, ...seferDoc.data() };
+    } else {
+      toast.error("Sefer bulunamadı");
+      throw new Error("Sefer bulunamadı");
+    }
+  } catch (error) {
+    toast.error("Sefer bilgileri alınırken bir hata oluştu");
+    throw error;
+  }
+};
+
+export const updateSeferKoltuk = async (seferId, koltukNo, durum) => {
+  try {
+    const seferRef = doc(db, "seferler", seferId);
+    const seferDoc = await getDoc(seferRef);
+    
+    if (!seferDoc.exists()) {
+      throw new Error("Sefer bulunamadı");
+    }
+
+    const mevcutKoltuklar = seferDoc.data().koltuklar || {};
+    
+    await updateDoc(seferRef, {
+      koltuklar: {
+        ...mevcutKoltuklar,
+        [koltukNo]: durum
+      }
+    });
+
+    return true;
+  } catch (error) {
+    toast.error("Koltuk güncellenirken bir hata oluştu");
     throw error;
   }
 };

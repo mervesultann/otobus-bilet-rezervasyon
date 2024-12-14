@@ -142,7 +142,7 @@ const SeferSearch = () => {
             </Form.Item>
           </div>
 
-          <Form.Item className="mb-0">
+          <Form.Item className="mb-0 " >
             <Button
               type="primary"
               htmlType="submit"

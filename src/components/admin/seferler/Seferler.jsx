@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Input, DatePicker, TimePicker, Popconfirm, message } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined } from '@ant-design/icons';
 import { getSeferler, addSefer, updateSefer, deleteSefer } from '../../../services/seferlerService';
 import dayjs from 'dayjs';
 import locale from 'antd/es/date-picker/locale/tr_TR';
+import SeferBiletleri from './SeferBiletleri';
 
 const Seferler = () => {
   const [seferler, setSeferler] = useState([]);
@@ -11,6 +12,8 @@ const Seferler = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingSefer, setEditingSefer] = useState(null);
   const [form] = Form.useForm();
+  const [selectedSefer, setSelectedSefer] = useState(null);
+  const [biletlerVisible, setBiletlerVisible] = useState(false);
 
   const fetchSeferler = async () => {
     setLoading(true);
@@ -116,6 +119,15 @@ const Seferler = () => {
             }}
           >
             Düzenle
+          </Button>
+          <Button
+            onClick={() => {
+              setSelectedSefer(record.id);
+              setBiletlerVisible(true);
+            }}
+            icon={<EyeOutlined />}
+          >
+            Biletler
           </Button>
           <Popconfirm
             title="Seferi silmek istediğinize emin misiniz?"
@@ -246,6 +258,15 @@ const Seferler = () => {
           </Form.Item>
         </Form>
       </Modal>
+
+      <SeferBiletleri
+        seferId={selectedSefer}
+        visible={biletlerVisible}
+        onClose={() => {
+          setBiletlerVisible(false);
+          setSelectedSefer(null);
+        }}
+      />
     </div>
   );
 };

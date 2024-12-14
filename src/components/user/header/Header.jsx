@@ -10,9 +10,10 @@ import {
 } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { FaUserCircle } from "react-icons/fa";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../../redux/slices/authSlice";
+import toast from 'react-hot-toast';
 
 
 const navigation = [
@@ -26,11 +27,20 @@ function classNames(...classes) {
 }
 
 const Header = () => {
- 
   const dispatch = useDispatch();
-  const { user} = useSelector((state) => state.auth); 
+  const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
   const { currentUserRole } = useSelector((state) => state.role);
- 
+
+  const handleLogout = async () => {
+    try {
+      await dispatch(logoutUser());
+      navigate('/');
+      toast.success('Başarıyla çıkış yapıldı');
+    } catch (error) {
+      toast.error('Çıkış yapılırken bir hata oluştu');
+    }
+  };
 
   return (
     <Disclosure as="nav" className="bg-slate-800 sticky top-0 z-50">
@@ -129,12 +139,12 @@ const Header = () => {
                     {currentUserRole === "user" && (
                       <>
                       <MenuItem>
-                        <Link to="/user/profile" className="block px-4 py-2 text-sm text-gray-700">
+                        <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700">
                           Profil
                         </Link>
                       </MenuItem>
                        <MenuItem>
-                       <Link to="/user/bilets" className="block px-4 py-2 text-sm text-gray-700">
+                       <Link to="/biletlerim" className="block px-4 py-2 text-sm text-gray-700">
                         Biletlerim
                        </Link>
                      </MenuItem>
@@ -144,8 +154,7 @@ const Header = () => {
                     <MenuItem>
                       <button
                         className="block px-4 py-2 text-sm text-gray-700"
-                        onClick={() => dispatch(logoutUser())}
-                        
+                        onClick={handleLogout}
                       >
                         Çıkış Yap
                       </button>
