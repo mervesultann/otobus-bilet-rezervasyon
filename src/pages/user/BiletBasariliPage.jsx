@@ -98,7 +98,14 @@ const BiletBasariliPage = () => {
             </div>
             <div>
               <p className="font-semibold">Ödenen Tutar:</p>
-              <p>₺{biletDetay?.fiyat}</p>
+              <p className="text-xl font-bold text-orange-500">
+                ₺{biletDetay?.odenecekTutar || biletDetay?.fiyat}
+                {biletDetay?.kampanyaBilgileri && (
+                  <span className="text-sm text-green-500 ml-2">
+                    ({biletDetay?.kampanyaBilgileri.indirimOrani}% indirim uygulandı)
+                  </span>
+                )}
+              </p>
             </div>
           </div>
         </Card>

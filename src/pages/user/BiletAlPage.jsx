@@ -21,9 +21,18 @@ const BiletAlPage = () => {
   const [form] = Form.useForm();
 
   useEffect(() => {
+    if (!user) {
+      navigate("/login", {
+        state: {
+          returnUrl: `/bilet-al/${seferId}`,
+          message: "Bilet almak için lütfen giriş yapın"
+        }
+      });
+      return;
+    }
+
     const fetchSefer = async () => {
       try {
-        // Burada sefer detaylarını Firebase'den çekeceğiz
         const seferData = await getSeferById(seferId);
         setSefer(seferData);
       } catch (error) {
@@ -34,7 +43,7 @@ const BiletAlPage = () => {
     };
 
     fetchSefer();
-  }, [seferId]);
+  }, [seferId, user, navigate]);
 
   const handleSubmit = async (values) => {
     if (!selectedSeat) {

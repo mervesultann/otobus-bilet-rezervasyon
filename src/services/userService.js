@@ -5,6 +5,7 @@ import {
   getDocs, 
   addDoc, 
   updateDoc, 
+  setDoc,
   deleteDoc, 
   query,
   where,
@@ -43,16 +44,22 @@ export const getUsers = async () => {
 // Tek kullanıcı getirme
 export const getUserById = async (userId) => {
   try {
-    const userDoc = await getDoc(doc(db, "users", userId));
-    if (userDoc.exists()) {
-      return { id: userDoc.id, ...userDoc.data() };
-    } else {
-      toast.error("Kullanıcı bulunamadı");
-      throw new Error("Kullanıcı bulunamadı");
+    const userRef = doc(db, "users", userId);
+    const userDoc = await getDoc(userRef);
+    
+    if (!userDoc.exists()) {
+      // Yeni kullanıcı için döküman oluştur
+      await setDoc(userRef, {
+        uid: userId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+      return { id: userId };
     }
+    
+    return { id: userDoc.id, ...userDoc.data() };
   } catch (error) {
     console.error("Kullanıcı bilgileri alma hatası:", error);
-    toast.error("Kullanıcı bilgileri alınırken bir hata oluştu");
     throw error;
   }
 };
@@ -61,13 +68,28 @@ export const getUserById = async (userId) => {
 export const updateUser = async (userId, userData) => {
   try {
     const userRef = doc(db, "users", userId);
-    await updateDoc(userRef, {
-      ...userData,
-      updatedAt: new Date().toISOString(),
-    });
+    const userDoc = await getDoc(userRef);
+    
+    if (!userDoc.exists()) {
+      // Kullanıcı dökümanı yoksa oluştur
+      await setDoc(userRef, {
+        ...userData,
+        uid: userId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+    } else {
+      // Varolan kullanıcıyı güncelle
+      await updateDoc(userRef, {
+        ...userData,
+        updatedAt: new Date().toISOString()
+      });
+    }
+    
     toast.success("Kullanıcı başarıyla güncellendi");
   } catch (error) {
-    toast.error("Kullanıcı güncellenirken bir hata oluştu");
+    console.error("Kullanıcı güncelleme hatası:", error);
+    toast.error("Kullanıc�� güncellenirken bir hata oluştu");
     throw error;
   }
 };
@@ -111,6 +133,42 @@ export const updateProfilePhoto = async (userId, photoURL) => {
     return photoURL;
   } catch (error) {
     toast.error("Profil fotoğrafı güncellenirken bir hata oluştu");
+    throw error;
+  }
+};
+
+export const updateOgrenciDurumu = async (userId, ogrenciBilgileri) => {
+  try {
+    const userRef = doc(db, "users", userId);
+    const userDoc = await getDoc(userRef);
+    
+    if (!userDoc.exists()) {
+      await setDoc(userRef, {
+        uid: userId,
+        ogrenciDurumu: {
+          okulAdi: ogrenciBilgileri.okulAdi,
+          ogrenciNo: ogrenciBilgileri.ogrenciNo,
+          dogrulandi: true,
+          dogrulamaTarihi: new Date().toISOString()
+        },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+    } else {
+      await updateDoc(userRef, {
+        ogrenciDurumu: {
+          okulAdi: ogrenciBilgileri.okulAdi,
+          ogrenciNo: ogrenciBilgileri.ogrenciNo,
+          dogrulandi: true,
+          dogrulamaTarihi: new Date().toISOString()
+        },
+        updatedAt: new Date().toISOString()
+      });
+    }
+    
+    return true;
+  } catch (error) {
+    console.error("Öğrenci durumu güncelleme hatası:", error);
     throw error;
   }
 };

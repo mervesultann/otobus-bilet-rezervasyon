@@ -16,6 +16,7 @@ import BiletAlPage from "../pages/user/BiletAlPage"
 import OdemePage from "../pages/user/OdemePage"
 import BiletBasariliPage from "../pages/user/BiletBasariliPage"
 import Biletlerim from "../pages/user/Biletlerim"
+import ProfilPage from "../pages/user/ProfilPage"
 
 
 const userRoutes = [
@@ -35,7 +36,7 @@ const userRoutes = [
           { path: "login", element: <LoginPage /> },
           { path: "register", element: <RegisterPage /> },
           { path: "sefer-sonuclari", element: <SeferSonuclari /> },
-          { path: "profile", element: <UserProfile /> },
+          { path: "profile", element: <ProfilPage /> },
           { path: "bilet-al/:seferId", element: <BiletAlPage /> },
           { path: "odeme/:seferId", element: <OdemePage /> },
           { path: "bilet-basarili", element: <BiletBasariliPage /> },

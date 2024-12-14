@@ -57,7 +57,7 @@ const Biletlerim = () => {
       title: "Sefer Bilgileri",
       dataIndex: "seferBilgileri",
       key: "seferBilgileri",
-      render: (sefer) => (
+      render: (sefer, record) => (
         <div>
           <div className="font-semibold">
             {sefer.kalkis} - {sefer.varis}
@@ -67,6 +67,14 @@ const Biletlerim = () => {
           </div>
           <div className="text-sm text-gray-500">
             Kalkış: {sefer.kalkisSaati} - Varış: {sefer.varisSaati}
+          </div>
+          <div className="text-sm font-semibold text-orange-500">
+            Ödenen Tutar: ₺{sefer.fiyat}
+            {record.kampanyaBilgileri && (
+              <span className="ml-2 text-green-500">
+                ({record.kampanyaBilgileri.indirimOrani}% indirim uygulandı)
+              </span>
+            )}
           </div>
         </div>
       ),

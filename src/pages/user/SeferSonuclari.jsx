@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
-import { Table, Button, Empty } from "antd";
+import { Table, Button, Empty, message } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
+import { useSelector } from "react-redux";
 
 const SeferSonuclari = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [seferler, setSeferler] = useState([]);
   const searchParams = location.state?.searchParams;
+  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     if (!searchParams) {
@@ -16,6 +18,19 @@ const SeferSonuclari = () => {
     }
     setSeferler(location.state?.seferler || []);
   }, [searchParams, navigate]);
+
+  const handleBiletAl = (seferId) => {
+    if (!user) {
+      navigate("/login", { 
+        state: { 
+          returnUrl: `/bilet-al/${seferId}`,
+          message: "Bilet almak için lütfen giriş yapın"
+        } 
+      });
+      return;
+    }
+    navigate(`/bilet-al/${seferId}`);
+  };
 
   const columns = [
     {
@@ -61,7 +76,7 @@ const SeferSonuclari = () => {
       render: (_, record) => (
         <Button
           type="primary"
-          onClick={() => navigate(`/bilet-al/${record.id}`)}
+          onClick={() => handleBiletAl(record.id)}
         >
           Bilet Al
         </Button>
