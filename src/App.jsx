@@ -6,6 +6,10 @@ import { store } from "./redux/store";
 import AppContent from "./components/AppContent";
 
 function App() {
+
+ 
+
+
   return (
     <Provider store={store}>
       <AppContent />

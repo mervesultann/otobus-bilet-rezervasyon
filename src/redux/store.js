@@ -4,6 +4,7 @@ import authReducer from "./slices/authSlice";
 import roleReducer from "./slices/roleSlice";
 import biletReducer from "./slices/biletSlice";
 import kampanyaReducer from "./slices/kampanyaSlice";
+import kampanyaBannerReducer from "./slices/kampanyaBannerSlice";
 
 export const store = configureStore({
   reducer: {
@@ -11,5 +12,6 @@ export const store = configureStore({
     role: roleReducer,
     bilet: biletReducer,
     kampanya: kampanyaReducer,
+    kampanyaBanner: kampanyaBannerReducer,
   },
 });

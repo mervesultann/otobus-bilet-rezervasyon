@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { auth, db } from '../../config/firebase';
 import { createUserWithEmailAndPassword, updateProfile, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 
 const provider = new GoogleAuthProvider();
@@ -89,14 +89,24 @@ export const signInWithGoogle = createAsyncThunk(
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       
-      // Firestore'a kullanıcı bilgilerini kaydet
-      await setDoc(doc(db, 'users', user.uid), {
-        role: 'user',
-        email: user.email,
-        fullName: user.displayName,
-        photoURL: user.photoURL,
-        createdAt: new Date().toISOString()
-      }, { merge: true });
+      // Önce mevcut kullanıcı verilerini kontrol et
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      
+      if (!userDoc.exists()) {
+        // Kullanıcı yoksa yeni oluştur
+        await setDoc(doc(db, 'users', user.uid), {
+          role: 'user',
+          email: user.email,
+          fullName: user.displayName,
+          photoURL: user.photoURL,
+          createdAt: new Date().toISOString()
+        });
+      } else {
+        // Sadece son giriş zamanını güncelle
+        await updateDoc(doc(db, 'users', user.uid), {
+          lastLogin: new Date().toISOString()
+        });
+      }
 
       return {
         uid: user.uid,
