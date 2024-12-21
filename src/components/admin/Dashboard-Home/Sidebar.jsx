@@ -9,14 +9,25 @@ import {
   FaBars,
   FaTimes,
   FaGlobeAmericas,
+  FaEnvelope,
 } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { Badge } from "antd";
+import { fetchMessages } from "../../../redux/slices/messageSlice";
 
 const Sidebar = ({ isMobile }) => {
   const [isOpen, setIsOpen] = useState(!isMobile);
+  const dispatch = useDispatch();
+  const { messages } = useSelector((state) => state.messages);
+  const { biletler } = useSelector((state) => state.bilet);
 
   useEffect(() => {
     setIsOpen(!isMobile);
   }, [isMobile]);
+
+  useEffect(() => {
+    dispatch(fetchMessages());
+  }, [dispatch]);
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -25,7 +36,7 @@ const Sidebar = ({ isMobile }) => {
   return (
     <div
       className={`
-        ${isMobile ? (isOpen && "w-full") : isOpen ? "w-64" : "w-16"} 
+        ${isMobile ? isOpen && "w-full" : isOpen ? "w-64" : "w-16"} 
         bg-gray-800 text-white 
         ${isMobile ? "h-auto" : "min-h-screen"} 
         transition-all duration-300
@@ -41,10 +52,6 @@ const Sidebar = ({ isMobile }) => {
           className="text-white p-2 hover:bg-gray-700 rounded"
         >
           {isOpen ? <FaTimes /> : <FaBars />}
-          
-             
-          
-          
         </button>
       </div>
 
@@ -92,6 +99,26 @@ const Sidebar = ({ isMobile }) => {
           >
             <FaTicketAlt className={`text-xl ${isMobile ? "" : "block"}`} />
             {(isOpen || isMobile) && <span className="ml-3">Biletler</span>}
+            <Badge
+              count={biletler.filter((b) => !b.viewed).length}
+              style={{ backgroundColor: "#52c41a" }}
+              className="ml-2"
+            />
+          </Link>
+        </li>
+
+        <li>
+          <Link
+            to="/admin/mesajlar"
+            className="flex items-center hover:bg-gray-700 p-2 rounded"
+          >
+            <FaEnvelope className={`text-xl ${isMobile ? "" : "block"}`} />
+            {(isOpen || isMobile) && <span className="ml-3">Mesajlar</span>}
+            <Badge
+              count={messages.filter((m) => m.status === "new").length}
+              style={{ backgroundColor: "#52c41a" }}
+              className="ml-2"
+            />
           </Link>
         </li>
 

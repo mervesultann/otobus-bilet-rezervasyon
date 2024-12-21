@@ -20,16 +20,16 @@ export const biletSil = createAsyncThunk(
   async (biletId, { getState }) => {
     const bilet = getState().bilet.biletler.find((b) => b.id === biletId);
     await deleteBilet(biletId);
-    
+
     if (bilet?.seferBilgileri?.id && bilet?.koltukNo) {
       await updateSeferKoltuk(bilet.seferBilgileri.id, bilet.koltukNo, {
         dolu: false,
         geciciRezervasyon: false,
         userId: null,
-        biletId: null
+        biletId: null,
       });
     }
-    
+
     return biletId;
   }
 );
@@ -48,6 +48,7 @@ const biletSlice = createSlice({
     biletler: [],
     loading: false,
     error: null,
+    newBiletCount: 0,
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -58,6 +59,9 @@ const biletSlice = createSlice({
       .addCase(fetchBiletler.fulfilled, (state, action) => {
         state.loading = false;
         state.biletler = action.payload;
+        state.newBiletCount = action.payload.filter(
+          (bilet) => !bilet.viewed
+        ).length;
         state.error = null;
       })
       .addCase(fetchBiletler.rejected, (state, action) => {
@@ -74,7 +78,7 @@ const biletSlice = createSlice({
       })
       .addCase(biletGuncelle.fulfilled, (state, action) => {
         state.loading = false;
-        state.biletler = state.biletler.map(bilet => 
+        state.biletler = state.biletler.map((bilet) =>
           bilet.id === action.payload.id ? action.payload : bilet
         );
         state.error = null;

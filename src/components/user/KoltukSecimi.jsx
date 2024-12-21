@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Modal, Radio } from 'antd';
-import { FaUserCircle, FaChair } from 'react-icons/fa';
+import { FaUserCircle } from 'react-icons/fa';
+import { MdEventSeat } from "react-icons/md";
 import classNames from 'classnames';
 
 const KoltukSecimi = ({ sefer, selectedSeat, onSeatSelect }) => {
@@ -61,7 +62,7 @@ const KoltukSecimi = ({ sefer, selectedSeat, onSeatSelect }) => {
                 isSelected && 'ring-4 ring-yellow-400'
               )}
             >
-              <FaChair className="text-2xl text-white" />
+              <MdEventSeat className="text-2xl text-white" />
               <span className="text-white text-sm">{koltukNo}</span>
             </button>
           );

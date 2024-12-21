@@ -69,7 +69,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center space-x-3">
                 <FaEnvelope className="text-orange-500" />
-                <span>info@seferium.com</span>
+                <span>info@seferbul.com</span>
               </li>
               <li className="flex items-center space-x-3">
                 <FaLocationDot className="text-orange-500" />
@@ -106,7 +106,7 @@ const Footer = () => {
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm">
-              &copy; {new Date().getFullYear()} Seferium. Tüm hakları saklıdır.
+              &copy; {new Date().getFullYear()} Seferbul. Tüm hakları saklıdır.
             </p>
             <div className="flex space-x-4 mt-4 md:mt-0">
               <Link to="/terms" className="text-sm hover:text-orange-500 transition-colors">

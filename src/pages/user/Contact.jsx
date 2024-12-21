@@ -2,6 +2,9 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { FaPhone, FaEnvelope, FaLocationDot } from "react-icons/fa6";
+import { useDispatch, useSelector } from "react-redux";
+import { sendMessage } from "../../redux/slices/messageSlice";
+import toast from "react-hot-toast";
 
 const schema = yup.object().shape({
   name: yup.string().required("İsim alanı zorunludur"),
@@ -11,16 +14,25 @@ const schema = yup.object().shape({
 });
 
 const ContactPage = () => {
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.messages);
+
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
+    try {
+      await dispatch(sendMessage(data)).unwrap();
+      reset();
+    } catch (error) {
+      console.error("Mesaj gönderme hatası:", error);
+    }
   };
 
   return (
@@ -121,10 +133,11 @@ const ContactPage = () => {
 
             <button
               type="submit"
+              disabled={loading}
               className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold
                 hover:bg-orange-600 transition-colors duration-200"
             >
-              Gönder
+              {loading ? "Gönderiliyor..." : "Gönder"}
             </button>
           </form>
         </div>

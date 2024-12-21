@@ -17,7 +17,11 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchBiletler, biletSil, biletGuncelle } from "../../../redux/slices/biletSlice";
+import {
+  fetchBiletler,
+  biletSil,
+  biletGuncelle,
+} from "../../../redux/slices/biletSlice";
 import dayjs from "dayjs";
 import { generateBiletNo } from "../../../utils/biletUtils";
 import { toast } from "react-hot-toast";
@@ -179,7 +183,10 @@ const Biletler = () => {
           <Button
             type="primary"
             icon={<EditOutlined />}
-            onClick={() => handleEdit(record)}
+            onClick={() => {
+              handleView(record);
+              handleEdit(record);
+            }}
           >
             Düzenle
           </Button>
@@ -210,25 +217,25 @@ const Biletler = () => {
 
   const handleUpdate = async (values) => {
     try {
-      const result = await dispatch(biletGuncelle({ 
-        biletId: editingBilet.id, 
-        values: {
-          ...values,
-          seferBilgileri: editingBilet.seferBilgileri // Sefer bilgilerini ekle
-        }
-      })).unwrap();
-      
+      const result = await dispatch(
+        biletGuncelle({
+          biletId: editingBilet.id,
+          values: {
+            ...values,
+            seferBilgileri: editingBilet.seferBilgileri, // Sefer bilgilerini ekle
+          },
+        })
+      ).unwrap();
+
       // Filtrelenmiş biletleri güncelle
-      setFilteredBiletler(prevBiletler => 
-        prevBiletler.map(bilet => 
-          bilet.id === result.id ? result : bilet
-        )
+      setFilteredBiletler((prevBiletler) =>
+        prevBiletler.map((bilet) => (bilet.id === result.id ? result : bilet))
       );
-      
+
       setIsModalVisible(false);
       form.resetFields();
       toast.success("Bilet başarıyla güncellendi");
-      
+
       // Biletleri yeniden yükle
       dispatch(fetchBiletler());
     } catch (error) {
@@ -243,6 +250,21 @@ const Biletler = () => {
       toast.success("Bilet başarıyla silindi");
     } catch (error) {
       toast.error("Bilet silinirken bir hata oluştu");
+    }
+  };
+
+  const handleView = async (bilet) => {
+    if (!bilet.viewed) {
+      try {
+        await dispatch(
+          biletGuncelle({
+            biletId: bilet.id,
+            values: { ...bilet, viewed: true },
+          })
+        ).unwrap();
+      } catch (error) {
+        console.error("Bilet güncelleme hatası:", error);
+      }
     }
   };
 
